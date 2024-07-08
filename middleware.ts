@@ -1,8 +1,8 @@
-// ** This version gives me an error with publicRoutes **
+//** This version gives me an error with publicRoutes **
 // import { clerkMiddleware } from "@clerk/nextjs/server";
 
 // export default clerkMiddleware({
-//   publicRoutes: ['/api/webhooks/clerk']
+//   publicRoutes: ['/', '/api/webhooks/clerk', '/api/webhooks/stripe'],
 // });
 
 // export const config = {
@@ -22,12 +22,12 @@ export const config = {
 };
 
 
-// ** This was an updated version provided by ChatGPT to get publicRoutes working with clerkMiddleware **
+//** This was an updated version provided by ChatGPT to get publicRoutes working with clerkMiddleware **
 // import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 // import { ClerkMiddlewareAuth, clerkMiddleware, getAuth } from "@clerk/nextjs/server";
 // import { NextMiddlewareResult } from "next/dist/server/web/types";
 
-// const publicRoutes = ['/', '/api/webhooks/clerk', '/api/webhooks/stripe'];
+// const publicRoutes = ['/', '/api/webhooks/clerk'];
 
 // export default function middleware(req: { (auth: ClerkMiddlewareAuth, request: NextRequest, event: NextFetchEvent): NextMiddlewareResult | Promise<NextMiddlewareResult>; nextUrl?: any; }) {
 //   const url = req.nextUrl.clone();
