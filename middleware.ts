@@ -1,44 +1,32 @@
-//** This version gives me an error with publicRoutes **
-// import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// export default clerkMiddleware({
-//   publicRoutes: ['/', '/api/webhooks/clerk', '/api/webhooks/stripe'],
-// });
-
-// export const config = {
-//   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
-// };
-
-
-// ** This version is deprecated **
-import { authMiddleware } from "@clerk/nextjs/server";
- 
-export default authMiddleware({
-  publicRoutes: ['/', '/api/webhooks/clerk', '/api/webhooks/stripe']
-});
- 
-export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
-};
-
-
-//** This was an updated version provided by ChatGPT to get publicRoutes working with clerkMiddleware **
-// import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-// import { ClerkMiddlewareAuth, clerkMiddleware, getAuth } from "@clerk/nextjs/server";
-// import { NextMiddlewareResult } from "next/dist/server/web/types";
-
-// const publicRoutes = ['/', '/api/webhooks/clerk'];
-
-// export default function middleware(req: { (auth: ClerkMiddlewareAuth, request: NextRequest, event: NextFetchEvent): NextMiddlewareResult | Promise<NextMiddlewareResult>; nextUrl?: any; }) {
-//   const url = req.nextUrl.clone();
+const isProtectedRoute = createRouteMatcher([
+  '/client',
   
-//   if (publicRoutes.includes(url.pathname)) {
-//     return NextResponse.next();
-//   }
+]);
 
-//   return clerkMiddleware(req);
-// }
+/**
+ * Middleware function that protects routes that are marked as protected.
+ * 
+ * This middleware is used to secure certain routes in the application. It checks if the
+ * current request is for a protected route, and if so, it calls the `auth().protect()`
+ * function to ensure that the user is authenticated before allowing access to the route.
+ *
+ * @param {import("@clerk/nextjs/server").Auth} auth - The authentication object provided by the Clerk library.
+ * @param {import("http").IncomingMessage} req - The incoming HTTP request object.
+ * @returns {Promise<void>} - A Promise that resolves when the middleware has finished executing.
+ */
+export default clerkMiddleware((auth, req)=>{
+  if (isProtectedRoute(req)){
+    auth().protect();
+  }
+});
 
-// export const config = {
-//   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
-// };
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+};
